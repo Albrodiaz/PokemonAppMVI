@@ -1,9 +1,11 @@
 package com.albrodiaz.pokemonappmvi.domain
 
-import com.albrodiaz.pokemonappmvi.data.PokemonService
+import com.albrodiaz.pokemonappmvi.data.PokemonRepository
+import com.albrodiaz.pokemonappmvi.data.response.Pokemon
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetAllPokemonUseCase @Inject constructor(private val pokemonService: PokemonService) {
+class GetAllPokemonUseCase @Inject constructor(private val pokemonRepository: PokemonRepository) {
 
-    suspend operator fun invoke() = pokemonService.getAllPokemons().body()?.results
+    operator fun invoke(): Flow<List<Pokemon>> = pokemonRepository.pokemon
 }

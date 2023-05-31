@@ -4,30 +4,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.albrodiaz.pokemonappmvi.data.response.Pokemon
 import com.albrodiaz.pokemonappmvi.domain.GetAllPokemonUseCase
+import com.albrodiaz.pokemonappmvi.ui.features.MainScreenViewState.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class PokemonScreenVM @Inject constructor(private val getAllPokemonUseCase: GetAllPokemonUseCase) :
+class PokemonScreenVM @Inject constructor(getAllPokemonUseCase: GetAllPokemonUseCase) :
     ViewModel() {
-
-    private val _viewState = MutableStateFlow<MainScreenViewState>(MainScreenViewState.Loading)
-    val viewState: StateFlow<MainScreenViewState> get() = _viewState
-
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (getAllPokemonUseCase.invoke().isNullOrEmpty()) {
-                _viewState.value = MainScreenViewState.Error(Throwable("Error al cargar los datos"))
-            } else {
-                _viewState.value =
-                    MainScreenViewState.Success(getAllPokemonUseCase.invoke() ?: emptyList())
-            }
-        }
-    }
+    val viewState: StateFlow<MainScreenViewState> = getAllPokemonUseCase().map(::Success)
+        .catch { MainScreenViewState.Error(it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MainScreenViewState.Loading)
 }
 
 sealed class MainScreenViewState {
