@@ -16,7 +16,6 @@ import com.albrodiaz.pokemonappmvi.data.response.PokemonDetail
 
 @Composable
 fun PokemonDetailScreen(pokemonName: String, detailVM: PokemonDetailVM = hiltViewModel()) {
-    
     val pokemon by detailVM.pokemon.collectAsState(PokemonDetail())
     
     Column(

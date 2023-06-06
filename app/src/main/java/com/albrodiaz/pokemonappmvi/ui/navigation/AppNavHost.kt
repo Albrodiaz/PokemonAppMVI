@@ -1,9 +1,11 @@
 package com.albrodiaz.pokemonappmvi.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.albrodiaz.pokemonappmvi.ui.features.pokemondetail.PokemonDetailScreen
 import com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen.PokemonScreen
 
@@ -17,7 +19,10 @@ fun MainScreen() {
                 navController.navigate(AppRoutes.DetailScreenRoute.createRoute(name))
             }
         }
-        composable(AppRoutes.DetailScreenRoute.route) { backstackEntry ->
+        composable(
+            AppRoutes.DetailScreenRoute.route,
+            arguments = listOf(navArgument("name") { type = NavType.StringType })
+        ) { backstackEntry ->
             val argument = backstackEntry.arguments?.getString("name")
             PokemonDetailScreen(pokemonName = argument.orEmpty())
         }

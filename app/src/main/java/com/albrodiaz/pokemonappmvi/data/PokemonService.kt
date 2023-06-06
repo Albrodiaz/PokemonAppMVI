@@ -11,6 +11,6 @@ interface PokemonService {
     @GET("pokemon?limit=151")
     suspend fun getAllPokemons(): Response<PokemonResponse>
 
-    @GET("{pokemon}")
-    suspend fun getPokemon(@Path("pokemon") pokemon: String): Response<DetailResponse>
+    @GET("pokemon/{name}")
+    suspend fun getPokemon(@Path("name") name: String): Response<DetailResponse>
 }
