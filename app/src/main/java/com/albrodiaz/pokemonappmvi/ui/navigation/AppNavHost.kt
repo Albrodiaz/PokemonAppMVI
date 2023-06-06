@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.albrodiaz.pokemonappmvi.ui.features.pokemondetail.PokemonDetail
+import com.albrodiaz.pokemonappmvi.ui.features.pokemondetail.PokemonDetailScreen
 import com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen.PokemonScreen
 
 @Composable
@@ -18,8 +18,8 @@ fun MainScreen() {
             }
         }
         composable(AppRoutes.DetailScreenRoute.route) { backstackEntry ->
-            val argument = backstackEntry.arguments?.getString("id")
-            PokemonDetail(pokemonName = argument.orEmpty())
+            val argument = backstackEntry.arguments?.getString("name")
+            PokemonDetailScreen(pokemonName = argument.orEmpty())
         }
     }
 }
