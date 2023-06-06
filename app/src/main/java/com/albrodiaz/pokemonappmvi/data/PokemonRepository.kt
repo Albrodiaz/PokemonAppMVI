@@ -26,12 +26,15 @@ class PokemonRepository @Inject constructor(private val pokemonService: PokemonS
     }
 }
 
-    private fun PokemonResponse.mapToPokemon(): List<Pokemon> {
-        return this.results.map {
+    private fun PokemonResponse.mapToPokemon(): List<Pokemon> =
+        this.results.map {
             Pokemon(it.name, it.url)
         }
-    }
 
-    private fun DetailResponse.mapToPokeDetail(): PokemonDetail {
-        return PokemonDetail(name = name, abilities = abilities)
-    }
+    private fun DetailResponse.mapToPokeDetail(): PokemonDetail =
+        PokemonDetail(
+            name = name,
+            abilities = abilities,
+            type = types,
+            sprites = sprites.front_default
+        )
