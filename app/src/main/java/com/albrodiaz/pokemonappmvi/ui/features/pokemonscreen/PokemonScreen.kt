@@ -1,10 +1,8 @@
-package com.albrodiaz.pokemonappmvi.ui.features
+package com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -21,14 +19,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import com.albrodiaz.pokemonappmvi.ui.features.components.PokemonCard
+import com.albrodiaz.pokemonappmvi.ui.components.PokemonCard
 
 @Composable
-fun MainScreen(pokemonVM: PokemonScreenVM = hiltViewModel()) {
+fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon: (String) -> Unit) {
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val state by produceState<MainScreenViewState>(
-        initialValue = MainScreenViewState.Loading,
+    val state by produceState<PokemonScreenViewState>(
+        initialValue = PokemonScreenViewState.Loading,
         key1 = lifecycle,
         key2 = pokemonVM
     ) {
@@ -40,31 +38,30 @@ fun MainScreen(pokemonVM: PokemonScreenVM = hiltViewModel()) {
     Column(Modifier.fillMaxSize()) {
         with(state) {
             when (this) {
-                is MainScreenViewState.Loading -> {
+                is PokemonScreenViewState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(modifier = Modifier.size(100.dp))
                     }
                 }
 
-                is MainScreenViewState.Error -> {
+                is PokemonScreenViewState.Error -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(text = error.message.toString())
                     }
                 }
 
-                is MainScreenViewState.Success -> {
+                is PokemonScreenViewState.Success -> {
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        modifier = Modifier
-                            .padding(horizontal = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        columns = GridCells.Fixed(2)
                     ) {
                         items(data) { pokemon ->
                             val index = data.indexOf(pokemon)
                             PokemonCard(
                                 title = pokemon.name.uppercaseFirst(),
                                 image = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${index + 1}.png"
-                            )
+                            ) {
+                                selectedPokemon(pokemon.name)
+                            }
                         }
                     }
                 }
