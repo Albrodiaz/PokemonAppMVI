@@ -56,16 +56,14 @@ fun MainScreen(pokemonVM: PokemonScreenVM = hiltViewModel()) {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         modifier = Modifier
-                            .padding(horizontal = 12.dp)
-                            .padding(top = 12.dp),
+                            .padding(horizontal = 12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(data) { pokemon ->
                             val index = data.indexOf(pokemon)
                             PokemonCard(
                                 title = pokemon.name.uppercaseFirst(),
-                                image = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${index + 1}.png",
-                                caught = index % 2 == 0//pokemon.caught ?: false
+                                image = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${index + 1}.png"
                             )
                         }
                     }
