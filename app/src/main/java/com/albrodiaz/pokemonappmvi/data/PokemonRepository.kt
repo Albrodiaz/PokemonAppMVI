@@ -33,9 +33,12 @@ private fun PokemonResponse.mapToPokemon(): List<Pokemon> =
 
 private fun DetailResponse.mapToPokeDetail(): PokemonDetail =
     PokemonDetail(
+        id = id,
         name = name,
         abilities = abilities,
         type = types,
         sprites = sprites.front_default,
-        baseExperience = base_experience
+        baseExperience = base_experience,
+        weight = weight,
+        height = height
     )
