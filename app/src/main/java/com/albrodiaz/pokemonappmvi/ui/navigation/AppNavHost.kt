@@ -23,8 +23,8 @@ fun MainScreen() {
             AppRoutes.DetailScreenRoute.route,
             arguments = listOf(navArgument("name") { type = NavType.StringType })
         ) { backstackEntry ->
-            val argument = backstackEntry.arguments?.getString("name")
-            PokemonDetailScreen(pokemonName = argument.orEmpty())
+            backstackEntry.arguments?.getString("name")
+            PokemonDetailScreen()
         }
     }
 }
