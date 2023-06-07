@@ -4,7 +4,6 @@ import com.albrodiaz.pokemonappmvi.data.response.Pokemon
 import com.albrodiaz.pokemonappmvi.data.response.PokemonDetail
 import com.albrodiaz.pokemonappmvi.data.response.PokemonResponse
 import com.albrodiaz.pokemonappmvi.data.response.details.DetailResponse
-import com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen.uppercaseFirst
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -34,10 +33,9 @@ private fun PokemonResponse.mapToPokemon(): List<Pokemon> =
 
 private fun DetailResponse.mapToPokeDetail(): PokemonDetail =
     PokemonDetail(
-        name = name.uppercaseFirst(),
-        background = types[0].type.name,
+        name = name,
         abilities = abilities,
-        type = types.map { it.type.name.uppercaseFirst() },
+        type = types,
         sprites = sprites.front_default,
         baseExperience = base_experience
     )
