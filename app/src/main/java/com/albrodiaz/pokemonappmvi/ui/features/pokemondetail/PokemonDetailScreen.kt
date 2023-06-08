@@ -19,10 +19,16 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +49,7 @@ import com.albrodiaz.pokemonappmvi.ui.components.TypeIcon
 import com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen.uppercaseFirst
 import com.albrodiaz.pokemonappmvi.ui.theme.Pink40
 import com.albrodiaz.pokemonappmvi.ui.theme.Purple40
+import com.albrodiaz.pokemonappmvi.ui.theme.SpecialGreen
 
 @Composable
 fun PokemonDetailScreen(detailVM: PokemonDetailVM = hiltViewModel()) {
@@ -57,6 +64,7 @@ fun PokemonDetailScreen(detailVM: PokemonDetailVM = hiltViewModel()) {
         }
     }
 
+
     with(state) {
         when (this) {
             is PokemonDetailViewState.Loading -> LoadingScreen()
@@ -68,57 +76,114 @@ fun PokemonDetailScreen(detailVM: PokemonDetailVM = hiltViewModel()) {
 
 @Composable
 private fun DetailScreen(pokemon: PokemonDetail) {
+    var shiny by remember { mutableStateOf(false) }
+
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
             .background(getColor(pokemon.type[0].type.name))
     ) {
-        val (image, info, experience) = createRefs()
+        val (image, info, experience, experienceBar) = createRefs()
 
-        Text(
-            text = "Base experience: ${pokemon.baseExperience}", modifier = Modifier
-                .padding(24.dp)
-                .constrainAs(experience) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
+        PCSlider(
+            pc = pokemon.baseExperience.toFloat(),
+            modifier = Modifier.constrainAs(experienceBar) {
+                top.linkTo(parent.top)
+                bottom.linkTo(experience.top)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
         )
+
+        PCText(
+            value = pokemon.baseExperience,
+            modifier = Modifier.constrainAs(experience) {
+                top.linkTo(experienceBar.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            })
 
         InfoCard(
             modifier = Modifier.constrainAs(info) {
                 bottom.linkTo(parent.bottom)
             }
         ) {
-            PokemonInfo(pokemonDetail = pokemon)
+            PokemonInfo(pokemonDetail = pokemon, checked = shiny) {
+                shiny = it
+            }
         }
 
-        PokemonImage(
-            image = pokemon.sprites,
-            modifier = Modifier.constrainAs(image) {
-                top.linkTo(info.top)
-                bottom.linkTo(info.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-        )
+        pokemon.sprites?.let {
+            PokemonImage(
+                image = if (shiny) it.front_shiny else it.front_default,
+                modifier = Modifier.constrainAs(image) {
+                    top.linkTo(info.top)
+                    bottom.linkTo(info.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+            )
+        }
     }
 }
 
 @Composable
-private fun PokemonInfo(pokemonDetail: PokemonDetail) {
+private fun PCSlider(pc: Float, modifier: Modifier = Modifier) {
+    Slider(
+        value = pc,
+        onValueChange = { },
+        valueRange = 1f..400f,
+        enabled = false,
+        colors = SliderDefaults.colors(
+            disabledThumbColor = Color.White,
+            disabledActiveTrackColor = Color.White
+        ),
+        modifier = modifier
+            .padding(top = 32.dp)
+            .padding(horizontal = 24.dp)
+    )
+}
+
+@Composable
+private fun PCText(value: Int, modifier: Modifier = Modifier) {
+    Text(
+        text = "Pc ${value}/400",
+        style = MaterialTheme.typography.titleMedium.copy(
+            color = Color.White,
+            fontWeight = FontWeight.Black
+        ),
+        modifier = modifier
+            .padding(horizontal = 24.dp)
+    )
+}
+
+@Composable
+private fun PokemonInfo(
+    pokemonDetail: PokemonDetail,
+    checked: Boolean = false,
+    onChecked: (Boolean) -> Unit
+) {
+    val healthPoints = pokemonDetail.stats[0].base_stat
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.size(120.dp))
+        Spacer(modifier = Modifier.size(80.dp))
         Text(
             text = pokemonDetail.name.uppercaseFirst(),
             style = MaterialTheme.typography.headlineMedium
         )
-        Spacer(modifier = Modifier.height(50.dp))
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            HealthRow(healthPoints = healthPoints)
+        }
+        Spacer(modifier = Modifier.height(20.dp))
         Row(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally),
@@ -174,7 +239,7 @@ private fun PokemonInfo(pokemonDetail: PokemonDetail) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
+                    .padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -184,12 +249,27 @@ private fun PokemonInfo(pokemonDetail: PokemonDetail) {
                     )
                 )
                 Text(
-                    text = "${(1..100).random()}",
+                    text = "${75}",
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold
                     )
                 )
             }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Switch(
+                checked = checked,
+                onCheckedChange = {
+                    onChecked(it)
+                },
+                modifier = Modifier.padding(end = 12.dp)
+            )
+            Text(text = if (checked) "Normal" else "Shiny")
         }
     }
 }
@@ -221,18 +301,34 @@ private fun InfoCard(modifier: Modifier, content: @Composable () -> Unit) {
 }
 
 @Composable
+private fun HealthRow(healthPoints: Int) {
+    Slider(
+        modifier = Modifier.fillMaxWidth(.6f),
+        value = healthPoints.toFloat(),
+        onValueChange = {},
+        enabled = false,
+        valueRange = 1f..healthPoints.toFloat(),
+        colors = SliderDefaults.colors(
+            disabledThumbColor = Color.Transparent,
+            disabledActiveTrackColor = SpecialGreen
+        )
+    )
+    Text(text = "$healthPoints/$healthPoints HP", style = MaterialTheme.typography.bodyMedium)
+}
+
+@Composable
 private fun PokemonType(modifier: Modifier = Modifier, type: String) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        PokemonIcon(type = type)
+        TypeIcon(type = type)
         Text(text = type.uppercaseFirst())
     }
 }
 
 @Composable
-private fun PokemonIcon(type: String) {
+private fun TypeIcon(type: String) {
     Image(
         painter = painterResource(id = getDrawable(type)),
         modifier = Modifier
@@ -267,7 +363,6 @@ private fun getDrawable(type: String): Int {
         "grass" -> TypeIcon.GRASS.icon
         "ground" -> TypeIcon.GROUND.icon
         "ice" -> TypeIcon.ICE.icon
-        "normal" -> TypeIcon.NORMAL.icon
         "poison" -> TypeIcon.POISON.icon
         "psychic" -> TypeIcon.PSYCHIC.icon
         "rock" -> TypeIcon.ROCK.icon

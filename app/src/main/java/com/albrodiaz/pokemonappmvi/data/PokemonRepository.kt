@@ -37,8 +37,9 @@ private fun DetailResponse.mapToPokeDetail(): PokemonDetail =
         name = name,
         abilities = abilities,
         type = types,
-        sprites = sprites.front_default,
+        sprites = sprites,
         baseExperience = base_experience,
         weight = weight,
-        height = height
+        height = height,
+        stats = stats
     )

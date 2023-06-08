@@ -3,7 +3,6 @@ package com.albrodiaz.pokemonappmvi.ui.features.pokemondetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.albrodiaz.pokemonappmvi.data.response.PokemonDetail
 import com.albrodiaz.pokemonappmvi.domain.GetDetailsUseCase
 import com.albrodiaz.pokemonappmvi.ui.features.pokemondetail.PokemonDetailViewState.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,10 +30,4 @@ class PokemonDetailVM @Inject constructor(
                 PokemonDetailViewState.Loading
             )
 
-}
-
-sealed class PokemonDetailViewState {
-    data class Error(val error: Throwable) : PokemonDetailViewState()
-    data class Success(val data: PokemonDetail) : PokemonDetailViewState()
-    object Loading : PokemonDetailViewState()
 }
