@@ -1,5 +1,6 @@
-package com.albrodiaz.pokemonappmvi.data
+package com.albrodiaz.pokemonappmvi.data.di
 
+import com.albrodiaz.pokemonappmvi.data.PokemonService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
