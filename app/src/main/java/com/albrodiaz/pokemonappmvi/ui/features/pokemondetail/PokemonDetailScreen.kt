@@ -45,9 +45,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import coil.compose.AsyncImage
 import com.albrodiaz.pokemonappmvi.data.response.PokemonDetail
 import com.albrodiaz.pokemonappmvi.ui.components.LoadingScreen
+import com.albrodiaz.pokemonappmvi.ui.components.PokemonRes
 import com.albrodiaz.pokemonappmvi.ui.components.Type
-import com.albrodiaz.pokemonappmvi.ui.components.background
-import com.albrodiaz.pokemonappmvi.ui.components.icon
+import com.albrodiaz.pokemonappmvi.ui.components.pokemonResource
 import com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen.uppercaseFirst
 import com.albrodiaz.pokemonappmvi.ui.theme.SpecialGreen
 
@@ -77,11 +77,15 @@ fun PokemonDetailScreen(detailVM: PokemonDetailVM = hiltViewModel()) {
 @Composable
 private fun DetailScreen(pokemon: PokemonDetail) {
     var shiny by remember { mutableStateOf(false) }
+    val mainType = pokemon.type[0].type.name
 
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .paint(painter = painterResource(id = getBackground(pokemon.type[0].type.name)), contentScale = ContentScale.Crop)
+            .paint(
+                painter = painterResource(id = getPokemonResources(mainType).background),
+                contentScale = ContentScale.Crop
+            )
     ) {
         val (image, info, experience, experienceBar) = createRefs()
 
@@ -329,7 +333,7 @@ private fun PokemonType(modifier: Modifier = Modifier, type: String) {
 @Composable
 private fun TypeIcon(type: String) {
     Image(
-        painter = painterResource(id = getDrawable(type)),
+        painter = painterResource(id = getPokemonResources(type).icon),
         modifier = Modifier
             .size(24.dp)
             .clip(CircleShape),
@@ -337,48 +341,25 @@ private fun TypeIcon(type: String) {
     )
 }
 
-private fun getBackground(type: String): Int {
+private fun getPokemonResources(type: String): PokemonRes {
     return when (type) {
-        "bug" -> Type.BUG.background
-        "dark" -> Type.DARK.background
-        "dragon" -> Type.DRAGON.background
-        "electric" -> Type.ELECTRIC.background
-        "fairy" -> Type.FAIRY.background
-        "fighting" -> Type.FIGHTING.background
-        "fire" -> Type.FIRE.background
-        "flying" -> Type.FLYING.background
-        "ghost" -> Type.GHOST.background
-        "grass" -> Type.GRASS.background
-        "ground" -> Type.GROUND.background
-        "ice" -> Type.ICE.background
-        "poison" -> Type.POISON.background
-        "psychic" -> Type.PSYCHIC.background
-        "rock" -> Type.ROCK.background
-        "steel" -> Type.STEEL.background
-        "water" -> Type.WATER.background
-        else -> Type.NORMAL.background
-    }
-}
-
-private fun getDrawable(type: String): Int {
-    return when (type) {
-        "bug" -> Type.BUG.icon
-        "dark" -> Type.DARK.icon
-        "dragon" -> Type.DRAGON.icon
-        "electric" -> Type.ELECTRIC.icon
-        "fairy" -> Type.FAIRY.icon
-        "fighting" -> Type.FIGHTING.icon
-        "fire" -> Type.FIRE.icon
-        "flying" -> Type.FLYING.icon
-        "ghost" -> Type.GHOST.icon
-        "grass" -> Type.GRASS.icon
-        "ground" -> Type.GROUND.icon
-        "ice" -> Type.ICE.icon
-        "poison" -> Type.POISON.icon
-        "psychic" -> Type.PSYCHIC.icon
-        "rock" -> Type.ROCK.icon
-        "steel" -> Type.STEEL.icon
-        "water" -> Type.WATER.icon
-        else -> Type.NORMAL.icon
+        "bug" -> Type.BUG.pokemonResource
+        "dark" -> Type.DARK.pokemonResource
+        "dragon" -> Type.DRAGON.pokemonResource
+        "electric" -> Type.ELECTRIC.pokemonResource
+        "fairy" -> Type.FAIRY.pokemonResource
+        "fighting" -> Type.FIGHTING.pokemonResource
+        "fire" -> Type.FIRE.pokemonResource
+        "flying" -> Type.FLYING.pokemonResource
+        "ghost" -> Type.GHOST.pokemonResource
+        "grass" -> Type.GRASS.pokemonResource
+        "ground" -> Type.GROUND.pokemonResource
+        "ice" -> Type.ICE.pokemonResource
+        "poison" -> Type.POISON.pokemonResource
+        "psychic" -> Type.PSYCHIC.pokemonResource
+        "rock" -> Type.ROCK.pokemonResource
+        "steel" -> Type.STEEL.pokemonResource
+        "water" -> Type.WATER.pokemonResource
+        else -> Type.NORMAL.pokemonResource
     }
 }
