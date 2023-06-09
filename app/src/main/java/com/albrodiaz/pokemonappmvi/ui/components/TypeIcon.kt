@@ -1,5 +1,6 @@
 package com.albrodiaz.pokemonappmvi.ui.components
 
+import androidx.annotation.DrawableRes
 import com.albrodiaz.pokemonappmvi.R
 
 enum class TypeIcon {
@@ -20,27 +21,24 @@ enum class TypeIcon {
     ROCK,
     STEEL,
     WATER;
+}
 
-    val icon: Int
-        get() {
-            return when(this) {
-                BUG -> R.drawable.bug
-                DARK -> R.drawable.dark
-                DRAGON -> R.drawable.dragon
-                ELECTRIC -> R.drawable.electric
-                FAIRY -> R.drawable.fairy
-                FIGHTING -> R.drawable.fighting
-                FIRE -> R.drawable.fire
-                FLYING -> R.drawable.flying
-                GRASS -> R.drawable.grass
-                GROUND -> R.drawable.ground
-                ICE -> R.drawable.ice
-                NORMAL -> R.drawable.normal
-                POISON -> R.drawable.poison
-                PSYCHIC -> R.drawable.psychic
-                ROCK -> R.drawable.rock
-                STEEL -> R.drawable.steel
-                WATER -> R.drawable.water
-            }
-        }
+val TypeIcon.icon: Int @DrawableRes get() = when(this) {
+    TypeIcon.BUG -> R.drawable.bug
+    TypeIcon.DARK -> R.drawable.dark
+    TypeIcon.DRAGON -> R.drawable.dragon
+    TypeIcon.ELECTRIC -> R.drawable.electric
+    TypeIcon.FAIRY -> R.drawable.fairy
+    TypeIcon.FIGHTING -> R.drawable.fighting
+    TypeIcon.FIRE -> R.drawable.fire
+    TypeIcon.FLYING -> R.drawable.flying
+    TypeIcon.GRASS -> R.drawable.grass
+    TypeIcon.GROUND -> R.drawable.ground
+    TypeIcon.ICE -> R.drawable.ice
+    TypeIcon.NORMAL -> R.drawable.normal
+    TypeIcon.POISON -> R.drawable.poison
+    TypeIcon.PSYCHIC -> R.drawable.psychic
+    TypeIcon.ROCK -> R.drawable.rock
+    TypeIcon.STEEL -> R.drawable.steel
+    TypeIcon.WATER -> R.drawable.water
 }

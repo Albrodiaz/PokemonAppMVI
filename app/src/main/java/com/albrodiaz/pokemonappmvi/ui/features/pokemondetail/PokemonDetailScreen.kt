@@ -46,6 +46,7 @@ import coil.compose.AsyncImage
 import com.albrodiaz.pokemonappmvi.data.response.PokemonDetail
 import com.albrodiaz.pokemonappmvi.ui.components.LoadingScreen
 import com.albrodiaz.pokemonappmvi.ui.components.TypeIcon
+import com.albrodiaz.pokemonappmvi.ui.components.icon
 import com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen.uppercaseFirst
 import com.albrodiaz.pokemonappmvi.ui.theme.Pink40
 import com.albrodiaz.pokemonappmvi.ui.theme.Purple40

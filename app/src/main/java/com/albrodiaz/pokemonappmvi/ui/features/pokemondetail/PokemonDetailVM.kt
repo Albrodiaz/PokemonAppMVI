@@ -29,5 +29,4 @@ class PokemonDetailVM @Inject constructor(
                 SharingStarted.WhileSubscribed(5000),
                 PokemonDetailViewState.Loading
             )
-
 }
