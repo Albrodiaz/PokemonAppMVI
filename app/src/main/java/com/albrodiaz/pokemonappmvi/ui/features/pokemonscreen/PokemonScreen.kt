@@ -88,7 +88,6 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
 }
 
 private fun getPokemonImage(index: Int) =
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${index + 1}.png"
-
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${index + 1}.png"
 fun String.uppercaseFirst() =
     this.substring(0 until 1).uppercase() + this.substring(1 until this.length)
