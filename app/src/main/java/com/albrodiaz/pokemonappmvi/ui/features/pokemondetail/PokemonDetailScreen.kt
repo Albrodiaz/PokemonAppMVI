@@ -1,7 +1,6 @@
 package com.albrodiaz.pokemonappmvi.ui.features.pokemondetail
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -45,10 +45,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import coil.compose.AsyncImage
 import com.albrodiaz.pokemonappmvi.data.response.PokemonDetail
 import com.albrodiaz.pokemonappmvi.ui.components.LoadingScreen
-import com.albrodiaz.pokemonappmvi.ui.components.TypeIcon
+import com.albrodiaz.pokemonappmvi.ui.components.Type
+import com.albrodiaz.pokemonappmvi.ui.components.background
+import com.albrodiaz.pokemonappmvi.ui.components.icon
 import com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen.uppercaseFirst
-import com.albrodiaz.pokemonappmvi.ui.theme.Pink40
-import com.albrodiaz.pokemonappmvi.ui.theme.Purple40
 import com.albrodiaz.pokemonappmvi.ui.theme.SpecialGreen
 
 @Composable
@@ -81,7 +81,7 @@ private fun DetailScreen(pokemon: PokemonDetail) {
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(getColor(pokemon.type[0].type.name))
+            .paint(painter = painterResource(id = getBackground(pokemon.type[0].type.name)), contentScale = ContentScale.Crop)
     ) {
         val (image, info, experience, experienceBar) = createRefs()
 
@@ -337,36 +337,48 @@ private fun TypeIcon(type: String) {
     )
 }
 
-private fun getColor(type: String): Color {
+private fun getBackground(type: String): Int {
     return when (type) {
-        "water" -> Color.Cyan.copy(alpha = .3f)
-        "fire", "dragon" -> Color.Red.copy(alpha = .5f)
-        "grass" -> Color.Green.copy(alpha = .5f)
-        "electric" -> Color.Yellow.copy(alpha = .5f)
-        "poison" -> Purple40.copy(alpha = .5f)
-        "fairy", "fighting" -> Pink40
-        else -> Color.Gray.copy(alpha = .5f)
+        "bug" -> Type.BUG.background
+        "dark" -> Type.DARK.background
+        "dragon" -> Type.DRAGON.background
+        "electric" -> Type.ELECTRIC.background
+        "fairy" -> Type.FAIRY.background
+        "fighting" -> Type.FIGHTING.background
+        "fire" -> Type.FIRE.background
+        "flying" -> Type.FLYING.background
+        "ghost" -> Type.GHOST.background
+        "grass" -> Type.GRASS.background
+        "ground" -> Type.GROUND.background
+        "ice" -> Type.ICE.background
+        "poison" -> Type.POISON.background
+        "psychic" -> Type.PSYCHIC.background
+        "rock" -> Type.ROCK.background
+        "steel" -> Type.STEEL.background
+        "water" -> Type.WATER.background
+        else -> Type.NORMAL.background
     }
 }
 
 private fun getDrawable(type: String): Int {
     return when (type) {
-        "bug" -> TypeIcon.BUG.icon
-        "dark" -> TypeIcon.DARK.icon
-        "dragon" -> TypeIcon.DRAGON.icon
-        "electric" -> TypeIcon.ELECTRIC.icon
-        "fairy" -> TypeIcon.FAIRY.icon
-        "fighting" -> TypeIcon.FIGHTING.icon
-        "fire" -> TypeIcon.FIRE.icon
-        "flying" -> TypeIcon.FLYING.icon
-        "grass" -> TypeIcon.GRASS.icon
-        "ground" -> TypeIcon.GROUND.icon
-        "ice" -> TypeIcon.ICE.icon
-        "poison" -> TypeIcon.POISON.icon
-        "psychic" -> TypeIcon.PSYCHIC.icon
-        "rock" -> TypeIcon.ROCK.icon
-        "steel" -> TypeIcon.STEEL.icon
-        "water" -> TypeIcon.WATER.icon
-        else -> TypeIcon.NORMAL.icon
+        "bug" -> Type.BUG.icon
+        "dark" -> Type.DARK.icon
+        "dragon" -> Type.DRAGON.icon
+        "electric" -> Type.ELECTRIC.icon
+        "fairy" -> Type.FAIRY.icon
+        "fighting" -> Type.FIGHTING.icon
+        "fire" -> Type.FIRE.icon
+        "flying" -> Type.FLYING.icon
+        "ghost" -> Type.GHOST.icon
+        "grass" -> Type.GRASS.icon
+        "ground" -> Type.GROUND.icon
+        "ice" -> Type.ICE.icon
+        "poison" -> Type.POISON.icon
+        "psychic" -> Type.PSYCHIC.icon
+        "rock" -> Type.ROCK.icon
+        "steel" -> Type.STEEL.icon
+        "water" -> Type.WATER.icon
+        else -> Type.NORMAL.icon
     }
 }

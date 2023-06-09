@@ -72,7 +72,7 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
                         columns = GridCells.Fixed(2)
                     ) {
                         items(data) { pokemon ->
-                            val index = data.indexOf(pokemon)
+                            val index = pokemon.url.getIndex()
                             PokemonCard(
                                 title = pokemon.name.uppercaseFirst(),
                                 image = getPokemonImage(index = index)
@@ -87,8 +87,15 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
     }
 }
 
+private fun String.getIndex(): Int {
+    val index = this
+        .substring(this.length - 4 until this.length)
+        .replace(Regex("[^0-9]"), "")
+    return index.toInt()
+}
+
 private fun getPokemonImage(index: Int) =
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${index + 1}.png"
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${index}.png"
 
 fun String.uppercaseFirst() =
     this.substring(0 until 1).uppercase() + this.substring(1 until this.length)
