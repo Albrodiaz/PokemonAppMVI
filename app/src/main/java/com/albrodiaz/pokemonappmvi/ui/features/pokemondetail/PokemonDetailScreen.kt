@@ -88,8 +88,7 @@ private fun DetailScreen(pokemon: PokemonDetail) {
         PCSlider(
             pc = pokemon.baseExperience.toFloat(),
             modifier = Modifier.constrainAs(experienceBar) {
-                top.linkTo(parent.top)
-                bottom.linkTo(experience.top)
+                top.linkTo(experience.bottom)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             }
@@ -98,7 +97,8 @@ private fun DetailScreen(pokemon: PokemonDetail) {
         PCText(
             value = pokemon.baseExperience,
             modifier = Modifier.constrainAs(experience) {
-                top.linkTo(experienceBar.bottom)
+                top.linkTo(parent.top, margin = 1.dp)
+                bottom.linkTo(experienceBar.top)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             })
@@ -115,9 +115,9 @@ private fun DetailScreen(pokemon: PokemonDetail) {
 
         pokemon.sprites?.let {
             PokemonImage(
-                image = if (shiny) it.front_shiny else it.front_default,
+                image = if (shiny) it.other.home.front_shiny else it.other.home.front_default,
                 modifier = Modifier.constrainAs(image) {
-                    top.linkTo(info.top)
+                    top.linkTo(experience.bottom, margin = 100.dp)
                     bottom.linkTo(info.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
@@ -139,8 +139,7 @@ private fun PCSlider(pc: Float, modifier: Modifier = Modifier) {
             disabledActiveTrackColor = Color.White
         ),
         modifier = modifier
-            .padding(top = 32.dp)
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 32.dp)
     )
 }
 
@@ -171,7 +170,7 @@ private fun PokemonInfo(
             .padding(horizontal = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.size(80.dp))
+        Spacer(modifier = Modifier.size(60.dp))
         Text(
             text = pokemonDetail.name.uppercaseFirst(),
             style = MaterialTheme.typography.headlineMedium

@@ -46,8 +46,13 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
             when (this) {
                 is PokemonScreenViewState.Loading -> {
                     val composition by
-                        rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.pokeball_loading))
-                    Box(modifier = Modifier.fillMaxSize().background(color = Color.Gray.copy(alpha = .3f)), contentAlignment = Alignment.Center) {
+                    rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.pokeball_loading))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Color.Gray.copy(alpha = .3f)),
+                        contentAlignment = Alignment.Center
+                    ) {
                         LottieAnimation(
                             modifier = Modifier.size(120.dp),
                             composition = composition,
@@ -70,7 +75,7 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
                             val index = data.indexOf(pokemon)
                             PokemonCard(
                                 title = pokemon.name.uppercaseFirst(),
-                                image = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${index + 1}.png"
+                                image = getPokemonImage(index = index)
                             ) {
                                 selectedPokemon(pokemon.name)
                             }
@@ -81,6 +86,9 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
         }
     }
 }
+
+private fun getPokemonImage(index: Int) =
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${index + 1}.png"
 
 fun String.uppercaseFirst() =
     this.substring(0 until 1).uppercase() + this.substring(1 until this.length)
