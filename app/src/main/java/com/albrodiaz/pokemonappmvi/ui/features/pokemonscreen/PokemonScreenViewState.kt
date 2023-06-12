@@ -7,3 +7,7 @@ sealed class PokemonScreenViewState {
     data class Success(val data: List<Pokemon>) : PokemonScreenViewState()
     object Loading : PokemonScreenViewState()
 }
+
+sealed class PokemonScreenIntent {
+    object LoadNext: PokemonScreenIntent()
+}

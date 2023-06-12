@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
@@ -25,6 +29,9 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.albrodiaz.pokemonappmvi.R
+import com.albrodiaz.pokemonappmvi.core.getIndex
+import com.albrodiaz.pokemonappmvi.core.isScrolled
+import com.albrodiaz.pokemonappmvi.core.uppercaseFirst
 import com.albrodiaz.pokemonappmvi.ui.components.PokemonCard
 
 @Composable
@@ -40,6 +47,8 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
             pokemonVM.viewState.collect { value = it }
         }
     }
+    val listState = rememberLazyGridState()
+    val isLoading by pokemonVM.isLoading.collectAsState()
 
     Column(Modifier.fillMaxSize()) {
         with(state) {
@@ -50,7 +59,7 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(color = Color.Gray.copy(alpha = .3f)),
+                            .background(color = Color.Gray.copy(alpha = .1f)),
                         contentAlignment = Alignment.Center
                     ) {
                         LottieAnimation(
@@ -68,16 +77,26 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
                 }
 
                 is PokemonScreenViewState.Success -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2)
-                    ) {
-                        items(data) { pokemon ->
-                            val index = pokemon.url.getIndex()
-                            PokemonCard(
-                                title = pokemon.name.uppercaseFirst(),
-                                image = getPokemonImage(index = index)
-                            ) {
-                                selectedPokemon(pokemon.name)
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            state = listState
+                        ) {
+                            items(data) { pokemon ->
+                                val index = pokemon.url.getIndex()
+                                PokemonCard(
+                                    title = pokemon.name.uppercaseFirst(),
+                                    image = getPokemonImage(index = index)
+                                ) {
+                                    selectedPokemon(pokemon.name)
+                                }
+                            }
+                        }
+                        if (isLoading) CircularProgressIndicator()
+
+                        if (listState.isScrolled()) {
+                            LaunchedEffect(Unit) {
+                                pokemonVM.handle(PokemonScreenIntent.LoadNext)
                             }
                         }
                     }
@@ -87,15 +106,6 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
     }
 }
 
-private fun String.getIndex(): Int {
-    val index = this
-        .substring(this.length - 4 until this.length)
-        .replace(Regex("[^0-9]"), "")
-    return index.toInt()
-}
-
-private fun getPokemonImage(index: Int) =
+fun getPokemonImage(index: Int) =
     "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${index}.png"
 
-fun String.uppercaseFirst() =
-    this.substring(0 until 1).uppercase() + this.substring(1 until this.length)

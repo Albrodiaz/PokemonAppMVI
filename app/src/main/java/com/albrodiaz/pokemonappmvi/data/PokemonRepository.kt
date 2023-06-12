@@ -11,10 +11,10 @@ import javax.inject.Inject
 
 class PokemonRepository @Inject constructor(private val pokemonService: PokemonService) {
 
-    val pokemon: Flow<List<Pokemon>> = callbackFlow {
-        val data = pokemonService.getAllPokemons().body()?.mapToPokemon()
+    fun pokemon(limit: Int, offset: Int) = callbackFlow {
+        val data = pokemonService.getAllPokemons(limit, offset).body()?.results
         trySend(data.orEmpty())
-        awaitClose { data.orEmpty() }
+        awaitClose()
     }
 
     fun getPokemonDetail(name: String): Flow<PokemonDetail> {

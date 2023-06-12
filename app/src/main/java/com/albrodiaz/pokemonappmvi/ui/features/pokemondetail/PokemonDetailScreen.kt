@@ -43,12 +43,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import coil.compose.AsyncImage
+import com.albrodiaz.pokemonappmvi.core.uppercaseFirst
 import com.albrodiaz.pokemonappmvi.data.response.PokemonDetail
 import com.albrodiaz.pokemonappmvi.ui.components.LoadingScreen
 import com.albrodiaz.pokemonappmvi.ui.components.PokemonRes
 import com.albrodiaz.pokemonappmvi.ui.components.Type
 import com.albrodiaz.pokemonappmvi.ui.components.pokemonResource
-import com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen.uppercaseFirst
 import com.albrodiaz.pokemonappmvi.ui.theme.SpecialGreen
 
 @Composable

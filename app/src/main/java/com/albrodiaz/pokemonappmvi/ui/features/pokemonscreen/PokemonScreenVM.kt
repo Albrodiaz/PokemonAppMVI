@@ -5,21 +5,51 @@ import androidx.lifecycle.viewModelScope
 import com.albrodiaz.pokemonappmvi.domain.GetAllPokemonUseCase
 import com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen.PokemonScreenViewState.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PokemonScreenVM @Inject constructor(getAllPokemonUseCase: GetAllPokemonUseCase) :
-    ViewModel() {
-    val viewState: StateFlow<PokemonScreenViewState> = getAllPokemonUseCase().map(::Success)
-        .catch { PokemonScreenViewState.Error(it) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000),
-            PokemonScreenViewState.Loading
-        )
+class PokemonScreenVM @Inject constructor(
+    private val getAllPokemonUseCase: GetAllPokemonUseCase
+) : ViewModel() {
+
+    private val limit = MutableStateFlow(0)
+    private val offset = MutableStateFlow(0)
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    private val _viewState =
+        MutableStateFlow<PokemonScreenViewState>(PokemonScreenViewState.Loading)
+    val viewState = _viewState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            limit.value += 10
+            getAllPokemonUseCase.invoke(limit.value, offset.value).collect {
+                _viewState.value = Success(it)
+            }
+        }
+    }
+
+    fun handle(action: PokemonScreenIntent) {
+        with(action) {
+            when (this) {
+                is PokemonScreenIntent.LoadNext -> {
+                    viewModelScope.launch {
+                        _isLoading.value = true
+                        delay(2000)
+                        limit.value += 10
+                        getAllPokemonUseCase.invoke(limit.value, offset.value).collect {
+                            _viewState.value = Success(it)
+                            _isLoading.value = false
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
-
-
