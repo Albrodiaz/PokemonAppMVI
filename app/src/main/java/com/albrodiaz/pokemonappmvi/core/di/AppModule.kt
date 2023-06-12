@@ -1,4 +1,4 @@
-package com.albrodiaz.pokemonappmvi.data.di
+package com.albrodiaz.pokemonappmvi.core.di
 
 import com.albrodiaz.pokemonappmvi.data.PokemonService
 import dagger.Module
@@ -22,7 +22,7 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun ProvidePokemonService(retrofit: Retrofit): PokemonService =
+    fun providePokemonService(retrofit: Retrofit): PokemonService =
         retrofit.create(PokemonService::class.java)
 
 }

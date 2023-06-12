@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
@@ -32,23 +34,25 @@ import com.albrodiaz.pokemonappmvi.R
 import com.albrodiaz.pokemonappmvi.core.getIndex
 import com.albrodiaz.pokemonappmvi.core.isScrolled
 import com.albrodiaz.pokemonappmvi.core.uppercaseFirst
+import com.albrodiaz.pokemonappmvi.data.response.Pokemon
+import com.albrodiaz.pokemonappmvi.ui.components.AnimatedBottomFab
 import com.albrodiaz.pokemonappmvi.ui.components.PokemonCard
 
 @Composable
 fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon: (String) -> Unit) {
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val listState = rememberLazyGridState()
+    val isLoading by pokemonVM.isLoading.collectAsState()
     val state by produceState<PokemonScreenViewState>(
         initialValue = PokemonScreenViewState.Loading,
         key1 = lifecycle,
         key2 = pokemonVM
     ) {
         lifecycle.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
-            pokemonVM.viewState.collect { value = it }
+            pokemonVM.viewState.collect { viewState -> value = viewState }
         }
     }
-    val listState = rememberLazyGridState()
-    val isLoading by pokemonVM.isLoading.collectAsState()
 
     Column(Modifier.fillMaxSize()) {
         with(state) {
@@ -71,34 +75,23 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
                 }
 
                 is PokemonScreenViewState.Error -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .zIndex(1f), contentAlignment = Alignment.Center
+                    ) {
                         Text(text = error.message.toString())
                     }
                 }
 
                 is PokemonScreenViewState.Success -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            state = listState
-                        ) {
-                            items(data) { pokemon ->
-                                val index = pokemon.url.getIndex()
-                                PokemonCard(
-                                    title = pokemon.name.uppercaseFirst(),
-                                    image = getPokemonImage(index = index)
-                                ) {
-                                    selectedPokemon(pokemon.name)
-                                }
-                            }
-                        }
-                        if (isLoading) CircularProgressIndicator()
-
-                        if (listState.isScrolled()) {
-                            LaunchedEffect(Unit) {
-                                pokemonVM.handle(PokemonScreenIntent.LoadNext)
-                            }
-                        }
+                    PokemonScreenContent(
+                        listState = listState,
+                        data = data,
+                        isLoading = isLoading,
+                        onScroll = { pokemonVM.handle(PokemonScreenIntent.LoadNext) }
+                    ) { selected ->
+                        selectedPokemon(selected)
                     }
                 }
             }
@@ -106,6 +99,47 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
     }
 }
 
-fun getPokemonImage(index: Int) =
+@Composable
+fun PokemonScreenContent(
+    listState: LazyGridState,
+    data: List<Pokemon>,
+    isLoading: Boolean,
+    onScroll: () -> Unit,
+    onSelected: (String) -> Unit
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyVerticalGrid(
+            modifier = Modifier.align(Alignment.Center),
+            columns = GridCells.Fixed(2),
+            state = listState
+        ) {
+            items(data) { pokemon ->
+                val index = pokemon.url.getIndex()
+                PokemonCard(
+                    title = pokemon.name.uppercaseFirst(),
+                    image = getPokemonImage(index = index)
+                ) {
+                    onSelected(pokemon.name)
+                }
+            }
+        }
+        if (isLoading) CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+
+        AnimatedBottomFab(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            state = listState
+        ) {
+            //TODO: SearchScreen
+        }
+
+        if (listState.isScrolled()) {
+            LaunchedEffect(Unit) {
+                onScroll()
+            }
+        }
+    }
+}
+
+private fun getPokemonImage(index: Int) =
     "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${index}.png"
 
