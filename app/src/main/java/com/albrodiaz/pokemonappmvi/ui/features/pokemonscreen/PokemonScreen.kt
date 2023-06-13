@@ -39,7 +39,7 @@ import com.albrodiaz.pokemonappmvi.ui.components.AnimatedBottomFab
 import com.albrodiaz.pokemonappmvi.ui.components.PokemonCard
 
 @Composable
-fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon: (String) -> Unit) {
+fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), onSearch: () -> Unit, selectedPokemon: (String) -> Unit) {
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val listState = rememberLazyGridState()
@@ -89,6 +89,7 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), selectedPokemon:
                         listState = listState,
                         data = data,
                         isLoading = isLoading,
+                        onSearchClick = onSearch,
                         onScroll = { pokemonVM.handle(PokemonScreenIntent.LoadNext) }
                     ) { selected ->
                         selectedPokemon(selected)
@@ -105,6 +106,7 @@ fun PokemonScreenContent(
     data: List<Pokemon>,
     isLoading: Boolean,
     onScroll: () -> Unit,
+    onSearchClick: () -> Unit,
     onSelected: (String) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -129,7 +131,7 @@ fun PokemonScreenContent(
             modifier = Modifier.align(Alignment.BottomCenter),
             state = listState
         ) {
-            //TODO: SearchScreen
+            onSearchClick()
         }
 
         if (listState.isScrolled()) {
