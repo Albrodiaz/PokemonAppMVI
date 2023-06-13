@@ -2,10 +2,10 @@ package com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.albrodiaz.pokemonappmvi.data.response.Pokemon
 import com.albrodiaz.pokemonappmvi.domain.GetAllPokemonUseCase
 import com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen.PokemonScreenViewState.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -16,7 +16,7 @@ class PokemonScreenVM @Inject constructor(
     private val getAllPokemonUseCase: GetAllPokemonUseCase
 ) : ViewModel() {
 
-    private val limit = MutableStateFlow(0)
+    private val size = MutableStateFlow(10)
     private val offset = MutableStateFlow(0)
 
     private val _isLoading = MutableStateFlow(false)
@@ -28,8 +28,7 @@ class PokemonScreenVM @Inject constructor(
 
     init {
         viewModelScope.launch {
-            limit.value += 10
-            getAllPokemonUseCase.invoke(limit.value, offset.value).collect {
+            getAllPokemonUseCase.invoke(size.value, offset.value).collect {
                 _viewState.value = Success(it)
             }
         }
@@ -41,10 +40,9 @@ class PokemonScreenVM @Inject constructor(
                 is PokemonScreenIntent.LoadNext -> {
                     viewModelScope.launch {
                         _isLoading.value = true
-                        delay(2000)
-                        limit.value += 10
-                        getAllPokemonUseCase.invoke(limit.value, offset.value).collect {
-                            _viewState.value = Success(it)
+                        offset.value += size.value
+                        getAllPokemonUseCase.invoke(size.value, offset.value).collect {
+                            _viewState.value = Success(_viewState.value.pokemons + it)
                             _isLoading.value = false
                         }
                     }
@@ -53,3 +51,9 @@ class PokemonScreenVM @Inject constructor(
         }
     }
 }
+
+val PokemonScreenViewState.pokemons: List<Pokemon>
+    get() = when (this) {
+        is Success -> data
+        else -> emptyList()
+    }
