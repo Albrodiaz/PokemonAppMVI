@@ -7,5 +7,5 @@ import javax.inject.Inject
 
 class GetAllPokemonUseCase @Inject constructor(private val pokemonRepository: PokemonRepository) {
 
-    operator fun invoke(): Flow<List<Pokemon>> = pokemonRepository.pokemon
+    operator fun invoke(limit: Int, offset: Int): Flow<List<Pokemon>> = pokemonRepository.pokemon(limit, offset)
 }

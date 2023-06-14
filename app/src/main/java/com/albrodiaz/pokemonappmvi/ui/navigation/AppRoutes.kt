@@ -5,4 +5,5 @@ sealed class AppRoutes(val route: String) {
     object DetailScreenRoute: AppRoutes("DetailScreen/{name}") {
         fun createRoute(name: String) = "DetailScreen/$name"
     }
+    object SearchScreen: AppRoutes("SearchScreen")
 }
