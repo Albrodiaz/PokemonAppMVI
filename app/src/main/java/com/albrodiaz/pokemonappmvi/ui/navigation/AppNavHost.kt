@@ -29,6 +29,10 @@ fun MainScreen() {
             backstackEntry.arguments?.getString("name")
             PokemonDetailScreen()
         }
-        composable(AppRoutes.SearchScreen.route) { SearchScreen() }
+        composable(AppRoutes.SearchScreen.route) {
+            SearchScreen {
+                navController.navigate(AppRoutes.DetailScreenRoute.createRoute(it))
+            }
+        }
     }
 }

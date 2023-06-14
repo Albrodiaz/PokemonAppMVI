@@ -1,45 +1,47 @@
 package com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.albrodiaz.pokemonappmvi.R
 import com.albrodiaz.pokemonappmvi.core.getIndex
 import com.albrodiaz.pokemonappmvi.core.isScrolled
 import com.albrodiaz.pokemonappmvi.core.uppercaseFirst
 import com.albrodiaz.pokemonappmvi.data.response.Pokemon
 import com.albrodiaz.pokemonappmvi.ui.components.AnimatedBottomFab
+import com.albrodiaz.pokemonappmvi.ui.components.LoadingScreen
 import com.albrodiaz.pokemonappmvi.ui.components.PokemonCard
+import kotlinx.coroutines.launch
 
 @Composable
-fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), onSearch: () -> Unit, selectedPokemon: (String) -> Unit) {
+fun PokemonScreen(
+    pokemonVM: PokemonScreenVM = hiltViewModel(),
+    onSearch: () -> Unit,
+    selectedPokemon: (String) -> Unit
+) {
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val listState = rememberLazyGridState()
@@ -57,22 +59,7 @@ fun PokemonScreen(pokemonVM: PokemonScreenVM = hiltViewModel(), onSearch: () -> 
     Column(Modifier.fillMaxSize()) {
         with(state) {
             when (this) {
-                is PokemonScreenViewState.Loading -> {
-                    val composition by
-                    rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.pokeball_loading))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = Color.Gray.copy(alpha = .1f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        LottieAnimation(
-                            modifier = Modifier.size(120.dp),
-                            composition = composition,
-                            iterations = LottieConstants.IterateForever
-                        )
-                    }
-                }
+                is PokemonScreenViewState.Loading -> { LoadingScreen() }
 
                 is PokemonScreenViewState.Error -> {
                     Box(
@@ -109,6 +96,16 @@ fun PokemonScreenContent(
     onSearchClick: () -> Unit,
     onSelected: (String) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+
+    val searchVisible by remember(listState) {
+        derivedStateOf { listState.firstVisibleItemIndex <= 1 }
+    }
+
+    val upVisible by remember(listState) {
+        derivedStateOf { listState.firstVisibleItemIndex >= 25 }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
             modifier = Modifier.align(Alignment.Center),
@@ -129,9 +126,21 @@ fun PokemonScreenContent(
 
         AnimatedBottomFab(
             modifier = Modifier.align(Alignment.BottomCenter),
-            state = listState
+            state = listState,
+            visible = searchVisible
         ) {
             onSearchClick()
+        }
+
+        AnimatedBottomFab(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            state = listState,
+            icon = Icons.Default.KeyboardArrowUp,
+            visible = upVisible
+        ) {
+            scope.launch {
+                listState.animateScrollToItem(0)
+            }
         }
 
         if (listState.isScrolled()) {
@@ -142,6 +151,6 @@ fun PokemonScreenContent(
     }
 }
 
-private fun getPokemonImage(index: Int) =
+fun getPokemonImage(index: Int) =
     "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${index}.png"
 

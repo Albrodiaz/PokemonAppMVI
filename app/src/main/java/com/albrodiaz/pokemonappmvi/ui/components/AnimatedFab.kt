@@ -14,18 +14,19 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AnimatedBottomFab(modifier: Modifier = Modifier, state: LazyGridState, onClick: () -> Unit) {
-    val visible by remember(state) {
-        derivedStateOf { state.firstVisibleItemIndex <= 1 }
-    }
+fun AnimatedBottomFab(
+    modifier: Modifier = Modifier,
+    state: LazyGridState,
+    visible: Boolean,
+    icon: ImageVector = Icons.Default.Search,
+    onClick: () -> Unit) {
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Bottom,
@@ -45,7 +46,7 @@ fun AnimatedBottomFab(modifier: Modifier = Modifier, state: LazyGridState, onCli
                     .padding(24.dp),
                 shape = CircleShape
             ) {
-                Icon(imageVector = Icons.Default.Search, contentDescription = null)
+                Icon(imageVector = icon, contentDescription = null)
             }
         }
     }
