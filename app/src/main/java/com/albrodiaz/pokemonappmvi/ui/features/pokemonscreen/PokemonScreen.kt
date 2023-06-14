@@ -152,5 +152,11 @@ fun PokemonScreenContent(
 }
 
 fun getPokemonImage(index: Int) =
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${index}.png"
+    if (index > 1010) {
+        var tempIndex = index
+        tempIndex += (9999-1009)
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${tempIndex}.png"
+    } else {
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${index}.png"
+    }
 
