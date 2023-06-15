@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -50,7 +51,9 @@ fun SearchScreen(
         }
     }
     var value by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
+    val expanded by remember(value) {
+        derivedStateOf { value.isNotEmpty() }
+    }
 
     with(searchViewState) {
         when (this) {
@@ -75,11 +78,9 @@ fun SearchScreen(
                     pokemons = pokemons,
                     onValueChange = {
                         value = it
-                        expanded = it.isNotEmpty()
                     },
                     onTap = {
                         keyboardController?.hide()
-                        expanded = false
                     },
                     onPokemonSelected = { onPokemonSelected(it) }
                 )
