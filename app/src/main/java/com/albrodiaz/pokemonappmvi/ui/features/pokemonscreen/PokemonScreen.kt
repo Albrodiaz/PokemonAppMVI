@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.albrodiaz.pokemonappmvi.core.getIndex
+import com.albrodiaz.pokemonappmvi.core.getPokemonImage
 import com.albrodiaz.pokemonappmvi.core.isScrolled
 import com.albrodiaz.pokemonappmvi.core.uppercaseFirst
 import com.albrodiaz.pokemonappmvi.data.response.Pokemon
@@ -150,13 +151,4 @@ fun PokemonScreenContent(
         }
     }
 }
-
-fun getPokemonImage(index: Int) =
-    if (index > 1010) {
-        var tempIndex = index
-        tempIndex += (9999-1009)
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${tempIndex}.png"
-    } else {
-        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${index}.png"
-    }
 

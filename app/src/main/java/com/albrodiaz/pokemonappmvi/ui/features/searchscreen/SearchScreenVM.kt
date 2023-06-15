@@ -2,6 +2,7 @@ package com.albrodiaz.pokemonappmvi.ui.features.searchscreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.albrodiaz.pokemonappmvi.core.getPokemonImage
 import com.albrodiaz.pokemonappmvi.domain.GetPokemonNamesUseCase
 import com.albrodiaz.pokemonappmvi.ui.features.searchscreen.SearchScreenViewState.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,8 +18,16 @@ class SearchScreenVM @Inject constructor(
     pokemonNamesUseCase: GetPokemonNamesUseCase
 ) : ViewModel() {
 
-    val searchViewState: StateFlow<SearchScreenViewState> =
-        pokemonNamesUseCase.invoke().map(::Success)
+    var searchViewState: StateFlow<SearchScreenViewState> =
+        pokemonNamesUseCase.invoke()
+            .map {
+                Success(it.mapIndexed { index, name ->
+                    SearchablePokemonItem(
+                        name = name,
+                        image = getPokemonImage(index + 1)
+                    )
+                })
+            }
             .catch { SearchScreenViewState.Error(it.message ?: "") }
             .stateIn(
                 viewModelScope,
