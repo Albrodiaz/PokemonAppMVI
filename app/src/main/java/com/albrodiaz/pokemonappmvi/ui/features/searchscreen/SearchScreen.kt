@@ -9,27 +9,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.albrodiaz.pokemonappmvi.core.filterByName
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.albrodiaz.pokemonappmvi.core.uppercaseFirst
 import com.albrodiaz.pokemonappmvi.ui.components.CustomDropDownItem
 import com.albrodiaz.pokemonappmvi.ui.components.CustomDropDownMenu
 import com.albrodiaz.pokemonappmvi.ui.components.LoadingScreen
 import com.albrodiaz.pokemonappmvi.ui.components.PokemonImage
 import com.albrodiaz.pokemonappmvi.ui.components.SearchTextField
-import com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen.getPokemonImage
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -37,10 +39,21 @@ fun SearchScreen(
     searchScreenVM: SearchScreenVM = hiltViewModel(),
     onPokemonSelected: (String) -> Unit
 ) {
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
     val keyboardController = LocalSoftwareKeyboardController.current
-    val searchViewState by searchScreenVM.searchViewState.collectAsState()
+    val searchViewState by produceState<SearchScreenViewState>(
+        initialValue = SearchScreenViewState.Loading,
+        key1 = lifecycle,
+        key2 = searchScreenVM
+    ) {
+        lifecycle.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
+            searchScreenVM.searchViewState.collect { viewState -> value = viewState }
+        }
+    }
     var value by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
+    val expanded by remember(value) {
+        derivedStateOf { value.isNotEmpty() }
+    }
 
     with(searchViewState) {
         when (this) {
@@ -62,14 +75,12 @@ fun SearchScreen(
                 SearchScreenContent(
                     value = value,
                     expanded = expanded,
-                    names = names,
+                    pokemons = pokemons,
                     onValueChange = {
                         value = it
-                        expanded = it.isNotEmpty()
                     },
                     onTap = {
                         keyboardController?.hide()
-                        expanded = false
                     },
                     onPokemonSelected = { onPokemonSelected(it) }
                 )
@@ -82,7 +93,7 @@ fun SearchScreen(
 fun SearchScreenContent(
     value: String,
     expanded: Boolean,
-    names: List<String>,
+    pokemons: List<SearchablePokemonItem>,
     onTap: () -> Unit,
     onValueChange: (String) -> Unit,
     onPokemonSelected: (String) -> Unit
@@ -101,14 +112,13 @@ fun SearchScreenContent(
         SearchTextField(value = value, onValueChange = onValueChange)
 
         CustomDropDownMenu(expanded = expanded) {
-            val filteredList = names.filterByName(value)
+            val filteredList = pokemons.filter { it.name.lowercase().contains(value.lowercase()) }
             LazyColumn {
-                items(filteredList, key = { it }) { name ->
-                    val image = getPokemonImage(names.indexOf(name) + 1)
+                items(filteredList, key = { it.name }) {
                     CustomDropDownItem(
-                        headlineContent = { PokemonImage(image = image, size = 40.dp) },
-                        bodyContent = { Text(text = name.uppercaseFirst()) },
-                        onClickedItem = { onPokemonSelected(name) }
+                        headlineContent = { PokemonImage(image = it.image, size = 40.dp) },
+                        bodyContent = { Text(text = it.name.uppercaseFirst()) },
+                        onClickedItem = { onPokemonSelected(it.name) }
                     )
                 }
             }
