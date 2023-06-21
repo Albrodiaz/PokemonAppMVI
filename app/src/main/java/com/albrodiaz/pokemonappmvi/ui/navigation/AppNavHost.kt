@@ -16,10 +16,8 @@ fun MainScreen() {
 
     NavHost(navController = navController, startDestination = AppRoutes.MainScreenRoute.route) {
         composable(AppRoutes.MainScreenRoute.route) {
-            PokemonScreen(
-                onSearch = { navController.navigate(AppRoutes.SearchScreen.route) }
-            ) { name ->
-                navController.navigate(AppRoutes.DetailScreenRoute.createRoute(name))
+            PokemonScreen { destination ->
+                navController.navigate(destination)
             }
         }
         composable(
@@ -30,8 +28,8 @@ fun MainScreen() {
             PokemonDetailScreen()
         }
         composable(AppRoutes.SearchScreen.route) {
-            SearchScreen {
-                navController.navigate(AppRoutes.DetailScreenRoute.createRoute(it))
+            SearchScreen {destination ->
+                navController.navigate(AppRoutes.DetailScreenRoute.createRoute(destination))
             }
         }
     }

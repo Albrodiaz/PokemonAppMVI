@@ -1,11 +1,15 @@
 package com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.albrodiaz.pokemonappmvi.data.response.Pokemon
 import com.albrodiaz.pokemonappmvi.domain.GetAllPokemonUseCase
 import com.albrodiaz.pokemonappmvi.ui.features.pokemonscreen.PokemonScreenViewState.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -26,10 +30,19 @@ class PokemonScreenVM @Inject constructor(
         MutableStateFlow<PokemonScreenViewState>(PokemonScreenViewState.Loading)
     val viewState = _viewState.asStateFlow()
 
+    private val _event: MutableSharedFlow<Event> = MutableSharedFlow(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_LATEST
+    )
+    val event: Flow<Event> get() = _event
+
     init {
         viewModelScope.launch {
             getAllPokemonUseCase.invoke(size.value, offset.value).collect {
                 _viewState.value = Success(it)
+            }
+            event.collect {
+                Log.i("alberto", "event: $it")
             }
         }
     }
@@ -46,6 +59,10 @@ class PokemonScreenVM @Inject constructor(
                             _isLoading.value = false
                         }
                     }
+                }
+
+                is PokemonScreenIntent.Navigate -> {
+                    _event.tryEmit(Event.Navigate(route = route))
                 }
             }
         }

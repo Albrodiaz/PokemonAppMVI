@@ -10,4 +10,10 @@ sealed class PokemonScreenViewState {
 
 sealed class PokemonScreenIntent {
     object LoadNext: PokemonScreenIntent()
+    data class Navigate(val route: String): PokemonScreenIntent()
+}
+
+sealed class Event {
+    object Idle : Event()
+    data class Navigate(val route: String) : Event()
 }

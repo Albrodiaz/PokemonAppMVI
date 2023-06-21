@@ -34,19 +34,19 @@ import com.albrodiaz.pokemonappmvi.data.response.Pokemon
 import com.albrodiaz.pokemonappmvi.ui.components.AnimatedBottomFab
 import com.albrodiaz.pokemonappmvi.ui.components.LoadingScreen
 import com.albrodiaz.pokemonappmvi.ui.components.PokemonCard
+import com.albrodiaz.pokemonappmvi.ui.navigation.AppRoutes
 import kotlinx.coroutines.launch
 
 @Composable
 fun PokemonScreen(
     pokemonVM: PokemonScreenVM = hiltViewModel(),
-    onSearch: () -> Unit,
-    selectedPokemon: (String) -> Unit
+    navigateTo: (String) -> Unit
 ) {
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val listState = rememberLazyGridState()
     val isLoading by pokemonVM.isLoading.collectAsState()
-    val state by produceState<PokemonScreenViewState>(
+    val viewState by produceState<PokemonScreenViewState>(
         initialValue = PokemonScreenViewState.Loading,
         key1 = lifecycle,
         key2 = pokemonVM
@@ -55,11 +55,23 @@ fun PokemonScreen(
             pokemonVM.viewState.collect { viewState -> value = viewState }
         }
     }
+    val event by pokemonVM.event.collectAsState(initial = Event.Idle)
+
+    LaunchedEffect(event) {
+        with(event) {
+            when (this) {
+                is Event.Idle -> Unit
+                is Event.Navigate -> navigateTo(route)
+            }
+        }
+    }
 
     Column(Modifier.fillMaxSize()) {
-        with(state) {
+        with(viewState) {
             when (this) {
-                is PokemonScreenViewState.Loading -> { LoadingScreen() }
+                is PokemonScreenViewState.Loading -> {
+                    LoadingScreen()
+                }
 
                 is PokemonScreenViewState.Error -> {
                     Box(
@@ -76,10 +88,16 @@ fun PokemonScreen(
                         listState = listState,
                         data = data,
                         isLoading = isLoading,
-                        onSearchClick = onSearch,
+                        onSearchClick = {
+                            pokemonVM.handle(PokemonScreenIntent.Navigate(AppRoutes.SearchScreen.route))
+                        },
                         onScroll = { pokemonVM.handle(PokemonScreenIntent.LoadNext) }
                     ) { selected ->
-                        selectedPokemon(selected)
+                        pokemonVM.handle(
+                            PokemonScreenIntent.Navigate(
+                                AppRoutes.DetailScreenRoute.createRoute(selected)
+                            )
+                        )
                     }
                 }
             }
