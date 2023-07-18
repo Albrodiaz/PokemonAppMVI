@@ -1,5 +1,6 @@
 package com.albrodiaz.pokemonappmvi.ui.features.pokemondetail
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -34,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +51,7 @@ import com.albrodiaz.pokemonappmvi.core.uppercaseFirst
 import com.albrodiaz.pokemonappmvi.data.response.PokemonDetail
 import com.albrodiaz.pokemonappmvi.ui.components.LoadingScreen
 import com.albrodiaz.pokemonappmvi.ui.components.PokemonRes
+import com.albrodiaz.pokemonappmvi.ui.components.RoundedFab
 import com.albrodiaz.pokemonappmvi.ui.components.Type
 import com.albrodiaz.pokemonappmvi.ui.components.pokemonResource
 import com.albrodiaz.pokemonappmvi.ui.theme.SpecialGreen
@@ -87,7 +92,8 @@ private fun DetailScreen(pokemon: PokemonDetail) {
                 contentScale = ContentScale.Crop
             )
     ) {
-        val (image, info, experience, experienceBar) = createRefs()
+        val (image, info, experience, experienceBar, closeButton) = createRefs()
+        val context = LocalContext.current
 
         PCSlider(
             pc = pokemon.baseExperience.toFloat(),
@@ -127,6 +133,18 @@ private fun DetailScreen(pokemon: PokemonDetail) {
                     end.linkTo(parent.end)
                 }
             )
+        }
+
+        RoundedFab(
+            modifier = Modifier.constrainAs(closeButton) {
+                bottom.linkTo(parent.bottom, margin = 24.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            },
+            icon = Icons.Filled.Close
+        ) {
+            //Navigate back
+            Toast.makeText(context, "Click", Toast.LENGTH_SHORT).show()
         }
     }
 }
