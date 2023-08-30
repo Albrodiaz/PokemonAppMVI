@@ -1,12 +1,16 @@
 package com.albrodiaz.pokemonappmvi.ui.features.searchscreen
 
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -31,12 +35,14 @@ import com.albrodiaz.pokemonappmvi.ui.components.CustomDropDownItem
 import com.albrodiaz.pokemonappmvi.ui.components.CustomDropDownMenu
 import com.albrodiaz.pokemonappmvi.ui.components.LoadingScreen
 import com.albrodiaz.pokemonappmvi.ui.components.PokemonImage
+import com.albrodiaz.pokemonappmvi.ui.components.RoundedFab
 import com.albrodiaz.pokemonappmvi.ui.components.SearchTextField
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchScreen(
     searchScreenVM: SearchScreenVM = hiltViewModel(),
+    onClose: () -> Unit,
     onPokemonSelected: (String) -> Unit
 ) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -82,7 +88,8 @@ fun SearchScreen(
                     onTap = {
                         keyboardController?.hide()
                     },
-                    onPokemonSelected = { onPokemonSelected(it) }
+                    onPokemonSelected = { onPokemonSelected(it) },
+                    onClose = onClose
                 )
             }
         }
@@ -96,7 +103,8 @@ fun SearchScreenContent(
     pokemons: List<SearchablePokemonItem>,
     onTap: () -> Unit,
     onValueChange: (String) -> Unit,
-    onPokemonSelected: (String) -> Unit
+    onPokemonSelected: (String) -> Unit,
+    onClose: () -> Unit
 ) {
 
     Column(
@@ -122,6 +130,16 @@ fun SearchScreenContent(
                     )
                 }
             }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 8.dp),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            RoundedFab(icon = Icons.Filled.Close, onClick = onClose)
         }
     }
 }

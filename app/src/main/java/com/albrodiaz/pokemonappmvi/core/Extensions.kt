@@ -1,9 +1,7 @@
 package com.albrodiaz.pokemonappmvi.core
 
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import com.albrodiaz.pokemonappmvi.data.response.Pokemon
 import com.albrodiaz.pokemonappmvi.data.response.PokemonDetail
-import com.albrodiaz.pokemonappmvi.data.response.PokemonResponse
 import com.albrodiaz.pokemonappmvi.data.response.details.DetailResponse
 
 //Strings
@@ -22,12 +20,6 @@ fun List<String>.filterByName(text: String) =
 //LazyGrid
 fun LazyGridState.isScrolled() =
     layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
-
-//Response
-fun PokemonResponse.mapToPokemon(): List<Pokemon> =
-    this.results.map {
-        Pokemon(it.name, it.url)
-    }
 
 fun DetailResponse.mapToPokeDetail(): PokemonDetail =
     PokemonDetail(

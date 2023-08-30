@@ -1,6 +1,5 @@
 package com.albrodiaz.pokemonappmvi.ui.features.pokemondetail
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,7 +36,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,7 +55,7 @@ import com.albrodiaz.pokemonappmvi.ui.components.pokemonResource
 import com.albrodiaz.pokemonappmvi.ui.theme.SpecialGreen
 
 @Composable
-fun PokemonDetailScreen(detailVM: PokemonDetailVM = hiltViewModel()) {
+fun PokemonDetailScreen(detailVM: PokemonDetailVM = hiltViewModel(), navigateBack: () -> Unit) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val state by produceState<PokemonDetailViewState>(
         initialValue = PokemonDetailViewState.Loading,
@@ -74,13 +72,13 @@ fun PokemonDetailScreen(detailVM: PokemonDetailVM = hiltViewModel()) {
         when (this) {
             is PokemonDetailViewState.Loading -> LoadingScreen()
             is PokemonDetailViewState.Error -> Text(text = error.message.toString())
-            is PokemonDetailViewState.Success -> DetailScreen(pokemon = data)
+            is PokemonDetailViewState.Success -> DetailScreen(pokemon = data, navigateBack = navigateBack)
         }
     }
 }
 
 @Composable
-private fun DetailScreen(pokemon: PokemonDetail) {
+private fun DetailScreen(pokemon: PokemonDetail, navigateBack: () -> Unit) {
     var shiny by remember { mutableStateOf(false) }
     val mainType = pokemon.type[0].type.name
 
@@ -93,7 +91,6 @@ private fun DetailScreen(pokemon: PokemonDetail) {
             )
     ) {
         val (image, info, experience, experienceBar, closeButton) = createRefs()
-        val context = LocalContext.current
 
         PCSlider(
             pc = pokemon.baseExperience.toFloat(),
@@ -144,7 +141,7 @@ private fun DetailScreen(pokemon: PokemonDetail) {
             icon = Icons.Filled.Close
         ) {
             //Navigate back
-            Toast.makeText(context, "Click", Toast.LENGTH_SHORT).show()
+            navigateBack()
         }
     }
 }

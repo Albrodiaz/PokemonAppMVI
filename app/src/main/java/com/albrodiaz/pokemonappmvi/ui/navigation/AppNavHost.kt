@@ -25,10 +25,17 @@ fun MainScreen() {
             arguments = listOf(navArgument("name") { type = NavType.StringType })
         ) { backstackEntry ->
             backstackEntry.arguments?.getString("name")
-            PokemonDetailScreen()
+            PokemonDetailScreen(navigateBack = {
+                navController.navigateUp()
+            })
         }
         composable(AppRoutes.SearchScreen.route) {
-            SearchScreen {destination ->
+            SearchScreen(onClose = {
+                navController.popBackStack(
+                    AppRoutes.MainScreenRoute.route,
+                    inclusive = false
+                )
+            }) { destination ->
                 navController.navigate(AppRoutes.DetailScreenRoute.createRoute(destination))
             }
         }
